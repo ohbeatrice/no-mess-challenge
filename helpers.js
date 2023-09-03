@@ -13,22 +13,13 @@ let chores = [
   // ... rest of the Deep Cleaning Chores
 ];
 
-// Function to display help information
-export const displayHelp = () => {
-  return 'Here is a list of commands you can use:\n' +
-         '/yo - Replies with Yo!\n' +
-         '/dm - Sends you a DM\n' +
-         '/chores - Lists today\'s chores\n' +
-         'We also have a leaderboard functionality coming soon!';
-};
-
 // Function to list chores
 const listChores = () => {
   return chores;
 };
 
 // Function to display chores
-const displayChores = () => {
+const displayChores = (channel) => {
   try {
     const cleverResponses = [
       "🌟 Chore-o-vision: Presenting the Chorescape Saga! 🪄\n",
@@ -41,7 +32,8 @@ const displayChores = () => {
     const randomResponse = cleverResponses[Math.floor(Math.random() * cleverResponses.length)];
 
     if (chores.length === 0) {
-      return '🏖 No chores for today! Enjoy your free time!';
+      channel.send('🏖 No chores for today! Enjoy your free time!');
+      return;
     }
 
     const categorizedChores = chores.reduce((acc, chore) => {
@@ -55,10 +47,9 @@ const displayChores = () => {
       choreList += `**${category}**\n${choreNames.join('\n')}\n\n`;
     }
 
-    return `${randomResponse}${choreList}`;
+    channel.send(`${randomResponse}${choreList}`);
   } catch (err) {
     console.error("Error in displayChores:", err);
-    return 'An error occurred while fetching the chores.';
   }
 };
 
@@ -71,8 +62,4 @@ const displayLeaderboard = () => {
   }
 };
 
-module.exports = {
-  listChores,
-  displayChores,
-  displayLeaderboard
-};
+module.exports = { listChores, displayChores, displayLeaderboard };
