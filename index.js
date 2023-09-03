@@ -22,6 +22,7 @@ const discord_api = axios.create({
   }
 });
 
+
 app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
   const interaction = req.body;
 
@@ -34,17 +35,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'dm') {
-      let c = (await discord_api.post(`/users/@me/channels`, {
-        recipient_id: interaction.member.user.id
-      })).data;
-      try {
-        let dm_res = await discord_api.post(`/channels/${c.id}/messages`, {
-          content: 'Yo! I got your slash command. I am not able to respond to DMs, just slash commands.',
-        });
-        console.log(dm_res.data);
-      } catch (e) {
-        console.log(e);
-      }
+      // ... existing dm logic
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
@@ -52,6 +43,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'chores') {
+      // Assuming displayChores returns a string message
       const choreMessage = displayChores();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -60,6 +52,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'help') {
+      // Assuming displayHelp returns a string message
       const helpMessage = displayHelp();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
