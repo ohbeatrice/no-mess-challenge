@@ -13,6 +13,15 @@ let chores = [
   // ... rest of the Deep Cleaning Chores
 ];
 
+// Function to display help information
+export const displayHelp = () => {
+  return 'Here is a list of commands you can use:\n' +
+         '/yo - Replies with Yo!\n' +
+         '/dm - Sends you a DM\n' +
+         '/chores - Lists today\'s chores\n' +
+         'We also have a leaderboard functionality coming soon!';
+};
+
 // Function to list chores
 const listChores = () => {
   return chores;

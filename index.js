@@ -1,13 +1,13 @@
-require('dotenv').config()
-const APPLICATION_ID = process.env.APPLICATION_ID
-const TOKEN = process.env.TOKEN
-const PUBLIC_KEY = process.env.PUBLIC_KEY || 'not set'
-const GUILD_ID = process.env.GUILD_ID
-
+require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
-const { listChores, displayChores, displayLeaderboard } = require('./helpers'); // Import the functions
+const { listChores, displayChores, displayHelp } = require('./helpers');
+
+const APPLICATION_ID = process.env.APPLICATION_ID;
+const TOKEN = process.env.TOKEN;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const GUILD_ID = process.env.GUILD_ID;
 
 const app = express();
 
@@ -33,15 +33,13 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
           content: `Yo ${interaction.member.user.username}!`,
         },
       });
-    }
-
-    if (interaction.data.name === 'dm') {
+    } else if (interaction.data.name === 'dm') {
       let c = (await discord_api.post(`/users/@me/channels`, {
         recipient_id: interaction.member.user.id
       })).data;
       try {
         let dm_res = await discord_api.post(`/channels/${c.id}/messages`, {
-          content: 'Yo! I got your slash command. I am not able to respond to DMs just slash commands.',
+          content: 'Yo! I got your slash command. I am not able to respond to DMs, just slash commands.',
         });
         console.log(dm_res.data);
       } catch (e) {
@@ -53,14 +51,20 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
           content: '👍',
         },
       });
-    }
-
-    if (interaction.data.name === 'chores') {
-      const choreMessage = displayChores(); // Fetch the message from the displayChores function
+    } else if (interaction.data.name === 'chores') {
+      const choreMessage = displayChores();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: choreMessage, // Send the fetched message as content
+          content: choreMessage,
+        },
+      });
+    } else if (interaction.data.name === 'help') {
+      const helpMessage = displayHelp();
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: helpMessage,
         },
       });
     }
@@ -104,5 +108,5 @@ app.get('/', async (req, res) => {
 });
 
 app.listen(8999, () => {
-  console.log("Server is running on port 8999");
+  console.log('Server is running on port 8999');
 });
