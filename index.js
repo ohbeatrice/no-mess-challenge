@@ -1,50 +1,46 @@
+// This is like turning the robot on and setting up its tools.
 require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
 
-const { listChores, displayChores, displayLeaderboard, displayHelp } = require('./helpers');
+// These are ChoreBot's memory about chores and how to show them.
+const { listChores, displayChores, displayLeaderboard, displayHelp } = require('./choreUtilities');
 
+// These are secret codes ChoreBot needs to talk to Discord, its home.
 const APPLICATION_ID = process.env.APPLICATION_ID;
 const TOKEN = process.env.TOKEN;
-const PUBLIC_KEY = process.env.PUBLIC_KEY || 'not set';  // Default value for debugging
+const PUBLIC_KEY = process.env.PUBLIC_KEY || 'not set';
 const GUILD_ID = process.env.GUILD_ID;
 
+// This is like ChoreBot's ear, listening to people talking in Discord.
 const app = express();
 app.use(express.json());
 
-// Initialize Axios instance
+// ChoreBot uses this to understand and speak Discord's language.
 const discord_api = axios.create({
   baseURL: 'https://discord.com/api/',
   timeout: 3000,
   headers: {
-    "Authorization": `Bot ${TOKEN}`,
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-    "Access-Control-Allow-Headers": "Authorization"
+    "Authorization": `Bot ${TOKEN}`
   }
 });
 
+// When someone talks to ChoreBot, this is how ChoreBot responds.
 app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
   const interaction = req.body;
-  console.log("Received interaction:", interaction);
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
     if (interaction.data.name === 'yo') {
+      // If someone says "yo", ChoreBot says "Yo [your name]!" back.
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content: `Yo ${interaction.member.user.username}!`,
         },
       });
-    } else if (interaction.data.name === 'dm') {
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: '👍',
-        },
-      });
     } else if (interaction.data.name === 'chores') {
+      // If someone asks for chores, ChoreBot shows the chore list.
       const choreMessage = displayChores();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -53,6 +49,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'help') {
+      // If someone needs help, ChoreBot shows how to use it.
       const helpMessage = displayHelp();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -64,48 +61,40 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
   }
 });
 
+// These are the things people can say to ChoreBot. Like "yo", "chores", or "help".
 app.get('/register_commands', async (req, res) => {
-  let slash_commands = [
+  let commands = [
     {
       "name": "yo",
       "description": "replies with Yo!",
-      "options": []
-    },
-    {
-      "name": "dm",
-      "description": "sends user a DM",
-      "options": []
     },
     {
       "name": "chores",
       "description": "lists today's chores",
-      "options": []
     },
     {
       "name": "help",
       "description": "provides help information",
-      "options": []
     }
   ];
 
   try {
-    let discord_response = await discord_api.put(
+    await discord_api.put(
       `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,
-      slash_commands
+      commands
     );
-    console.log(discord_response.data);
     return res.send('commands have been registered');
   } catch (e) {
-    console.error(e.code);
-    console.error(e.response?.data);
-    return res.send(`${e.code} error from discord`);
+    return res.send(`Oops, something went wrong: ${e.code}`);
   }
 });
 
+// ChoreBot will say this if someone finds it but doesn't know how to use it.
 app.get('/', async (req, res) => {
-  return res.send('Follow documentation');
+  return res.send('Follow the instructions to talk to me!');
 });
 
+// ChoreBot's ear is now fully open, and it's listening on channel 8999.
 app.listen(8999, () => {
-  console.log('Server is running on port 8999');
+  console.log('ChoreBot is listening and ready to help!');
 });
