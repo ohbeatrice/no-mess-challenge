@@ -80,6 +80,11 @@ app.get('/register_commands', async (req, res) => {
       "name": "chores",
       "description": "lists today's chores",
       "options": []
+    },
+    {
+      "name": "help",
+      "description": "provides help information",
+      "options": []
     }
   ];
 
