@@ -2,7 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
-const { listChores, displayChores, displayLeaderboard } = require('./helpers');
+const { listChores, displayChores, displayLeaderboard, displayHelp } = require('./helpers'); // Added displayHelp
 
 const APPLICATION_ID = process.env.APPLICATION_ID;
 const TOKEN = process.env.TOKEN;
@@ -22,7 +22,6 @@ const discord_api = axios.create({
   }
 });
 
-
 app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
   const interaction = req.body;
 
@@ -35,7 +34,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'dm') {
-      // ... existing dm logic
+      // existing dm logic to send a direct message
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
@@ -43,7 +42,7 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
         },
       });
     } else if (interaction.data.name === 'chores') {
-      // Assuming displayChores returns a string message
+      // Assuming displayChores() would return a string message, needs adjustment in helpers.js
       const choreMessage = displayChores();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -82,6 +81,7 @@ app.get('/register_commands', async (req, res) => {
       "options": []
     }
   ];
+
   try {
     let discord_response = await discord_api.put(
       `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,

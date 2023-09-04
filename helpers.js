@@ -19,21 +19,10 @@ const listChores = () => {
 };
 
 // Function to display chores
-const displayChores = (channel) => {
+const displayChores = () => {
   try {
-    const cleverResponses = [
-      "🌟 Chore-o-vision: Presenting the Chorescape Saga! 🪄\n",
-      "🎉 Chore-tastic Adventure Awaits! Your Chores of the Day:\n",
-      "🪚 The Chore Chronicles Unfold: Dive into Today's Tasks!\n",
-      "🚀 Chore Quest: Embark on a Journey through Household Heroism!\n",
-      "🔮 The Enchanted Choreboard: Where Tasks Transform into Triumphs!\n"
-    ];
-    
-    const randomResponse = cleverResponses[Math.floor(Math.random() * cleverResponses.length)];
-
     if (chores.length === 0) {
-      channel.send('🏖 No chores for today! Enjoy your free time!');
-      return;
+      return '🏖 No chores for today! Enjoy your free time!';
     }
 
     const categorizedChores = chores.reduce((acc, chore) => {
@@ -47,9 +36,10 @@ const displayChores = (channel) => {
       choreList += `**${category}**\n${choreNames.join('\n')}\n\n`;
     }
 
-    channel.send(`${randomResponse}${choreList}`);
+    return choreList;
   } catch (err) {
     console.error("Error in displayChores:", err);
+    return 'An error occurred while fetching chores.';
   }
 };
 
@@ -62,4 +52,9 @@ const displayLeaderboard = () => {
   }
 };
 
-module.exports = { listChores, displayChores, displayLeaderboard };
+// Add a stub for displayHelp
+const displayHelp = () => {
+  return "Help text can go here.";
+};
+
+module.exports = { listChores, displayChores, displayLeaderboard, displayHelp };
